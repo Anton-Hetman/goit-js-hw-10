@@ -1,11 +1,8 @@
 import { key_url } from './api_key';
 import { refs } from './refs';
-export function catApi(keyword) {
-  const params = new URLSearchParams({
-    apikey: key_url.API_KEY,
-    keyword,
-  });
-  return fetch(`${key_url.CAT_URL}?limit=10&breed_ids=beng&api_key=${params}`)
+export const breedId = refs.select.value;
+export function catApi(breedId) {
+  return fetch(`${key_url.CAT_URL}?${breedId}&${key_url.API_KEY}`)
     .then(response => {
       if (!response.ok) {
         throw new Error(response.status);
