@@ -1,23 +1,33 @@
-import './css/index.css';
+import './css/styles.css';
 import { refs } from './js/refs';
-import { catApi, breedId } from './js/cat_info';
-import { fetchBreeds } from './js/cat-api';
-import { breedSelection } from './js/breed_selection';
+import { fetchBreeds } from './js/fetchBreeds';
+import { selectBreed } from './js/breadSelect';
+import { fetchCatByBreed } from './js/cat-api';
+import { markupOneCat } from './js/markupOneCat';
 
-fetchBreeds(breedId).then(breedSelection);
+import Notiflix from 'notiflix';
+fetchBreeds('cat')
+  .then(selectBreed)
+  .then(optionContent)
+  .finally(() => {
+    Notiflix.Loading.remove();
+  });
+refs.breedSelect.addEventListener('change', selectCatByBreed);
 
-function catInformations(data) {
-  console.log(data);
-  const markupOneCat = data
-    .map(data => {
-      return `<img src=${data.cfa_url} alt="${data.name}" width="400"/>< class="text-container"><p><span class="text">Breeds:</span> ${data.name}</p><p><span class="text">Description:</span> ${data.description}</p><p><span class="text">Temperament:</span> ${data.temperament}</p>`;
-    })
-    .join('');
-  console.log(markupOneCat);
-  // refs.catInfoDiv.innerHTML = '';
-  refs.catInfoDiv.insertAdjacentHTML('beforeend', markupOneCat);
+function selectCatByBreed(evt) {
+  const breedId = refs.breedSelect.value;
+
+  const markup = fetchCatByBreed(breedId)
+    .then(markupOneCat)
+    .then(optionOneCat)
+    .finally(() => {
+      Notiflix.Loading.remove();
+    });
 }
 
-refs.select.addEventListener('change', function () {
-  catApi(breedId).then(catInformations);
-});
+function optionOneCat(markup) {
+  refs.catInfo.innerHTML = markup;
+}
+function optionContent(markup) {
+  refs.breedSelect.insertAdjacentHTML('beforeend', markup);
+}
